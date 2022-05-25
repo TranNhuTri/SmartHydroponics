@@ -24,7 +24,7 @@ html = """
         <script>
             var client_id = Date.now()
             document.querySelector("#ws-id").textContent = client_id;
-            var ws = new WebSocket(`ws://localhost:8080/ws/${client_id}`);
+            var ws = new WebSocket(`wss://smart-hydroponics.herokuapp.com/ws/${client_id}`);
             ws.onmessage = function(event) {
                 var messages = document.getElementById('messages')
                 var message = document.createElement('li')
@@ -43,7 +43,6 @@ html = """
 </html>
 """
 
-
 class ConnectionManager:
     def __init__(self):
         self.active_connections: List[WebSocket] = []
@@ -51,6 +50,11 @@ class ConnectionManager:
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
         self.active_connections.append(websocket)
+        connections = ""
+        for connection in self.active_connections:
+            connections = connections + ", " + str(connection.client.host) + ":" + str(connection.client.port)
+        logging.warning('Address: ' + str(id(self.active_connections)))
+        logging.warning('Connections: ' + connections)
 
     def disconnect(self, websocket: WebSocket):
         self.active_connections.remove(websocket)
@@ -61,7 +65,6 @@ class ConnectionManager:
     async def broadcast(self, message: str):
         for connection in self.active_connections:
             await connection.send_text(message)
-
 
 manager = ConnectionManager()
 @app.on_event("startup")
