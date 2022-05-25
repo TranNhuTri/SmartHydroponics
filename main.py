@@ -2,9 +2,11 @@ from typing import List
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 import logging
 
 app = FastAPI()
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 html = """
 <!DOCTYPE html>
