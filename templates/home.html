@@ -1,4 +1,38 @@
 {% extends 'base.html' %}
 {% block content %}
-    <h1>Hello</h1>
+    <div class="row row-cols-2">
+        <div class="col mb-4">
+            <div class="crd border rounded-pill bg-white p-3 d-flex">
+                <div class="rounded-circle shadow text-secondary p-4">
+                    <i class="fa-solid fa-temperature-high icon d-flex justify-content-center align-items-center"></i>
+                </div>
+                <div class="px-3">
+                    <div>Solution Temperature</div>
+                    <span class="display-6">25</span><span class="ps-2">°C</span>
+                </div>
+            </div>
+        </div>
+        <div class="col mb-4">
+            <div class="crd border rounded-pill bg-white p-3 d-flex">
+                <div class="rounded-circle shadow text-secondary p-4">
+                    <i class="fa-solid fa-droplet icon d-flex justify-content-center align-items-center"></i>
+                </div>
+                <div class="px-3">
+                    <div>Solution TDS</div>
+                    <span class="display-6">254</span><span class="ps-2">ppm</span>
+                </div>
+            </div>
+        </div>
+        <div class="col mb-4">
+            <div class="crd border rounded-pill bg-white p-3 d-flex">
+                <div class="rounded-circle shadow text-secondary p-4">
+                    <i class="fa-solid fa-glass-water-droplet icon d-flex justify-content-center align-items-center"></i>
+                </div>
+                <div class="px-3">
+                    <div>Solution Height</div>
+                    <span class="display-6">15</span><span class="ps-2">cm</span>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock%}
