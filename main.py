@@ -1,50 +1,14 @@
 from typing import List
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request
 from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 import logging
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-html = """
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Chat</title>
-    </head>
-    <body>
-        <h1>WebSocket Chat</h1>
-        <h2>Your ID: <span id="ws-id"></span></h2>
-        <form action="" onsubmit="sendMessage(event)">
-            <input type="text" id="messageText" autocomplete="off"/>
-            <button>Send</button>
-        </form>
-        <ul id='messages'>
-        </ul>
-        <script>
-            var client_id = Date.now()
-            document.querySelector("#ws-id").textContent = client_id;
-            var ws = new WebSocket(`wss://smart-hydroponics.herokuapp.com/ws/${client_id}`);
-            ws.onmessage = function(event) {
-                var messages = document.getElementById('messages')
-                var message = document.createElement('li')
-                var content = document.createTextNode(event.data)
-                message.appendChild(content)
-                messages.appendChild(message)
-            };
-            function sendMessage(event) {
-                var input = document.getElementById("messageText")
-                ws.send(input.value)
-                input.value = ''
-                event.preventDefault()
-            }
-        </script>
-    </body>
-</html>
-"""
-
+templates = Jinja2Templates(directory="templates")
 class ConnectionManager:
     def __init__(self):
         self.active_connections: List[WebSocket] = []
@@ -52,11 +16,6 @@ class ConnectionManager:
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
         self.active_connections.append(websocket)
-        connections = ""
-        for connection in self.active_connections:
-            connections = connections + ", " + str(connection.client.host) + ":" + str(connection.client.port)
-        logging.warning('Address: ' + str(id(self.active_connections)))
-        logging.warning('Connections: ' + connections)
 
     def disconnect(self, websocket: WebSocket):
         self.active_connections.remove(websocket)
@@ -69,14 +28,10 @@ class ConnectionManager:
             await connection.send_text(message)
 
 manager = ConnectionManager()
-@app.on_event("startup")
-async def startup_event():
-    logging.warning('This is a warning message')
 
 @app.get("/")
-async def get():
-    return HTMLResponse(html)
-
+async def get(request: Request):
+    return templates.TemplateResponse("home.html", {"request": request})
 
 @app.websocket("/ws/{client_id}")
 async def websocket_endpoint(websocket: WebSocket, client_id: int):
